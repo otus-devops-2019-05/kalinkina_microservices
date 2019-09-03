@@ -1,0 +1,5 @@
+[app]
+appserver  ansible_host=34.76.68.28
+[all:vars]
+ansible_ssh_user=appuser
+ansible_ssh_private_key_file=~/.ssh/appuser

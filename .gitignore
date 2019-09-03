@@ -4,5 +4,5 @@ docker-monolith/infra/packer/variables.json
 *.tfstate.backup
 *.tfvars
 .terraform/
-ansible/ansible
+docker-monolith/infra/ansible/ansible
 *.retry

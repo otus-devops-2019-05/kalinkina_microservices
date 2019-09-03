@@ -1,0 +1,27 @@
+---
+- name: Configure App
+  hosts: app
+  become: true
+  tasks:
+    - name: Install pip
+      apt:
+        name: python-pip
+        update_cache: yes
+
+    - name: install certain python modules for docker
+      pip:
+        name: docker
+        version: 2.0.0
+        state: present
+
+    - name: Log into DockerHub
+      docker_login:
+        username: e485b48b03c0
+        password: "XXXXXXXXXXX"
+
+    - name: Deploy docker
+      docker_container:
+        name: reddit
+        image: e485b48b03c0/otus-reddit:1.0
+        ports:
+          - "9292:9292"

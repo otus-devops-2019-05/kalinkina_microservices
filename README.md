@@ -57,3 +57,9 @@ Run 'docker system COMMAND --help' for more information on a command.
 > Docker Hub - это облачный registry сервис от компании Docker. В него можно выгружать и загружать из него докер образы. Docker по умолчанию скачивает образы из докер хаба.
 
   - `docker diff reddit` показывает разницу в файлах между имиджом и контейнером
+
+### Задача со *
+
+  - packer_docker.yml для установки docker, docker.json для билда
+  - terraform для создания инстанса и открытия фаервола
+  - ansible deploy.yml для поднятия докер контейнера
