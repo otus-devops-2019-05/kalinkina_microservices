@@ -1,0 +1,24 @@
+{
+    "builders": [
+        {
+            "type": "googlecompute",
+            "project_id": "strategic-pier-251609",
+            "image_name": "docker-{{timestamp}}",
+            "image_family": "docker-full",
+            "source_image_family": "ubuntu-1604-lts",
+            "zone": "europe-west1-b",
+            "ssh_username": "appuser",
+            "machine_type": "f1-micro"
+        }
+    ],
+    "provisioners": [
+      {
+            "type": "ansible",
+            "playbook_file": "ansible/playbooks/packer_docker.yml",
+            "extra_arguments": [
+               "--ssh-extra-args",
+               "-o IdentitiesOnly=yes"
+        ]
+      }
+  ]
+}
