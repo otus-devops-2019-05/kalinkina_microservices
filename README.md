@@ -43,13 +43,15 @@ Run 'docker system COMMAND --help' for more information on a command.
 
 
   - export GOOGLE_PROJECT=_ваш-проект_
-  - ```
+  - 
+  ```
   docker-machine create --driver google \
   --google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
   --google-machine-type n1-standard-1 \
   --google-zone europe-west1-b \
   docker-host
   ```
+  
   - `eval $(docker-machine env docker-host)`
 
   #### PID namespace
@@ -100,10 +102,16 @@ docker run -d --network=reddit -p 9292:9292 <your-dockerhub-login>/ui:1.0
 ```
 
   - уменьшение образа 
+  2.0 - образ ubuntu
 ```
 REPOSITORY                 TAG                 IMAGE ID            CREATED             SIZE
 /ui            2.0                 3090a19896d1        29 seconds ago      453MB
 /ui            1.0                 0693301e3a2f        34 minutes ago      782MB
 /comment       1.0                 9940b31c2e5a        38 minutes ago      780MB
 /post          1.0                 ff93ebf20177        43 minutes ago      206MB
+```
+  3.0 - образ alpine
+```
+REPOSITORY                 TAG                 IMAGE ID            CREATED             SIZE
+XXXXXXXXXXXX/ui            3.0                 5b4a06f51525        51 seconds ago      335MB
 ```
