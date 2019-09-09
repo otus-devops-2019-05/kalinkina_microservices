@@ -51,7 +51,7 @@ Run 'docker system COMMAND --help' for more information on a command.
   --google-zone europe-west1-b \
   docker-host
   ```
-  
+
   - `eval $(docker-machine env docker-host)`
 
   #### PID namespace
