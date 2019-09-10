@@ -3,5 +3,5 @@ sudo: required
 language: bash
 
 before_install:
-  - "travis_wait mvn install"
+  - "travis_wait 20 sleep 1200 &"
   - curl https://raw.githubusercontent.com/express42/otus-homeworks/2019-05/run.sh | bash
