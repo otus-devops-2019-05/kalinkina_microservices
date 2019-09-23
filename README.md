@@ -115,3 +115,92 @@ REPOSITORY                 TAG                 IMAGE ID            CREATED      
 REPOSITORY                 TAG                 IMAGE ID            CREATED             SIZE
 XXXXXXXXXXXX/ui            3.0                 5b4a06f51525        51 seconds ago      335MB
 ```
+***
+## HW-14
+## Работа с сетью в Docker
+
+#### Null network driver
+
+  - Для контейнера создается свой network namespace
+  - У контейнера есть только loopback интерфейс
+  ```
+  lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+  ```
+  - Сеть контейнера полностью изолирована
+#### Host network driver
+
+  - Контейнер использует network namespace хоста (поэтому выводы `docker run -ti --rm --network host joffotron/docker-net-tools -c ifconfig` и `docker-machine ssh docker-host ifconfig` не отличается)
+```
+  br-a7e1eee49780 Link encap:Ethernet  HWaddr 02:42:D6:A9:4C:4C  
+          inet addr:172.18.0.1  Bcast:172.18.255.255  Mask:255.255.0.0
+          inet6 addr: fe80::42:d6ff:fea9:4c4c%32703/64 Scope:Link
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:30 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:47 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:11924 (11.6 KiB)  TX bytes:11432 (11.1 KiB)
+
+docker0   Link encap:Ethernet  HWaddr 02:42:FC:CC:74:9E  
+          inet addr:172.17.0.1  Bcast:172.17.255.255  Mask:255.255.0.0
+          inet6 addr: fe80::42:fcff:fecc:749e%32703/64 Scope:Link
+          UP BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:59711 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:73180 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:4609042 (4.3 MiB)  TX bytes:1238059852 (1.1 GiB)
+
+ens4      Link encap:Ethernet  HWaddr 42:01:0A:84:00:03  
+          inet addr:10.132.0.3  Bcast:10.132.0.3  Mask:255.255.255.255
+          inet6 addr: fe80::4001:aff:fe84:3%32703/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1460  Metric:1
+          RX packets:576306 errors:0 dropped:0 overruns:0 frame:599
+          TX packets:521496 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:2069009448 (1.9 GiB)  TX bytes:293093926 (279.5 MiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1%32703/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:932330 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:932330 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:126447265 (120.5 MiB)  TX bytes:126447265 (120.5 MiB)
+```
+  - Сеть не управляется самим Docker
+  - Два сервиса в разных контейнерах не могут слушать один и тот же порт (поэтому 3 контейнера с nginx не смогли запустится, т.к. порт уже занят)
+```
+2019/09/17 20:19:06 [emerg] 1#1: bind() to 0.0.0.0:80 failed (98: Address already in use)
+nginx: [emerg] bind() to 0.0.0.0:80 failed (98: Address already in use)
+  CONTAINER ID        IMAGE                      COMMAND                  CREATED             STATUS                      PORTS               NAMES
+e190445dfceb        nginx                      "nginx -g 'daemon of…"   20 seconds ago      Exited (1) 15 seconds ago                       quizzical_satoshi
+15607f8d9d01        nginx                      "nginx -g 'daemon of…"   24 seconds ago      Exited (1) 20 seconds ago                       condescending_nightingale
+a5a8dc381043        nginx                      "nginx -g 'daemon of…"   28 seconds ago      Exited (1) 23 seconds ago                       affectionate_mahavira
+3df3f697a2df        nginx                      "nginx -g 'daemon of…"   33 seconds ago      Up 29 seconds                                   festive_montalcini
+```
+  - Производительность сети контейнера равна производительности сети хоста
+
+```
+sudo ln -s /var/run/docker/netns /var/run/netns
+sudo ip netns
+``` 
+
+> ip netns exec <namespace> <command> - позволит выполнять команды в выбранном namespace
+
+#### Bridge network driver
+  - Назначается по умолчанию для контейнеров
+  - Нельзя вручную назначать IP-адреса
+  - Нет Service Discovery
+
+## Docker-compose
+Если базовое имя не задано, то используется название директории, в которой лежит файл docker-compose.yml. 
+Задать имя проекта можно с помощью переменной COMPOSE_PROJECT_NAME или указать имя во время поднятия композа `docker-compose -p my_project up -d`
+
+
+

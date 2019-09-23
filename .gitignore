@@ -6,3 +6,4 @@ docker-monolith/infra/packer/variables.json
 .terraform/
 docker-monolith/infra/ansible/ansible
 *.retry
+.env
