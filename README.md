@@ -202,5 +202,4 @@ sudo ip netns
 Если базовое имя не задано, то используется название директории, в которой лежит файл docker-compose.yml. 
 Задать имя проекта можно с помощью переменной COMPOSE_PROJECT_NAME или указать имя во время поднятия композа `docker-compose -p my_project up -d`
 
-
-
+> By default, Compose reads two files, a docker-compose.yml and an optional docker-compose.override.yml file. By convention, the docker-compose.yml contains your base configuration. The override file, as its name implies, can contain configuration overrides for existing services or entirely new services.
