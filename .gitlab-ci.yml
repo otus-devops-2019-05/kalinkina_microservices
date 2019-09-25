@@ -8,10 +8,14 @@ stages:
 variables:
   DATABASE_URL: 'mongodb://mongo/user_posts'
 
+before_script:
+  - apk --update --no-cache add py-pip docker 
+  - pip install docker-compose
+  - cd src
+
 build_job:
   stage: build
   script:
-    - cd src
     - docker-compose build
 
 test_unit_job:
@@ -33,7 +37,6 @@ test_integration_job:
 deploy_dev_job:
   stage: review
   script:
-    - cd src
     - docker-compose up -d
   environment:
     name: dev
@@ -41,7 +44,9 @@ deploy_dev_job:
 
 branch review:
   stage: review
-  script: echo "Deploy to $CI_ENVIRONMENT_SLUG"
+  script: 
+    - echo "Deploy to $CI_ENVIRONMENT_SLUG"
+    - docker-compose up -d
   environment:
     name: branch/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.example.com
@@ -57,6 +62,7 @@ staging:
     - /^\d+\.\d+\.\d+/
   script:
     - echo 'Deploy'
+    - docker-compose up -d
   environment:
     name: stage
     url: https://beta.example.com
@@ -68,6 +74,7 @@ production:
     - /^\d+\.\d+\.\d+/
   script:
     - echo 'Deploy'
+    - docker-compose up -d
   environment:
     name: production
     url: https://example.com
