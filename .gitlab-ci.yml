@@ -15,8 +15,8 @@ build_job:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p "$CI_REGISTRY_PASSWORD"
   script:
-    - docker build -t reddit:$CI_COMMIT_SHA ./docker-monolith
-    - docker push reddit:$CI_COMMIT_SHA
+    - docker build -t "$CI_REGISTRY_USER"/reddit:$CI_COMMIT_SHA ./docker-monolith
+    - docker push "$CI_REGISTRY_USER"/reddit:$CI_COMMIT_SHA
 
 test_unit_job:
   before_script:
@@ -39,8 +39,8 @@ deploy_dev_job:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p "$CI_REGISTRY_PASSWORD"
   script:
-    - docker pull reddit:$CI_COMMIT_SHA
-    - docker run -d -p 9292:9292 --rm reddit:$CI_COMMIT_SHA
+    - docker pull "$CI_REGISTRY_USER"/reddit:$CI_COMMIT_SHA
+    - docker run -d -p 9292:9292 --rm "$CI_REGISTRY_USER"/reddit:$CI_COMMIT_SHA
   environment:
     name: dev
     url: http://dev.example.com
