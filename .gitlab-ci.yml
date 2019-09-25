@@ -1,3 +1,5 @@
+image: docker:18.09.7-dind
+
 stages:
   - build
   - test
@@ -9,8 +11,7 @@ variables:
   DATABASE_URL: 'mongodb://mongo/user_posts'
 
 before_script:
-  - apk --update --no-cache add py-pip docker build-base python2-dev libffi-dev openssl-dev
-  - pip install docker-compose
+  - apk --update --no-cache add py-pip 
   - cd src
   - export $(cat .env.example | xargs)
 
