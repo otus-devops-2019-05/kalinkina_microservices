@@ -11,7 +11,11 @@ variables:
 build_job:
   stage: build
   script:
-    - echo 'Building'
+    - pwd
+    - ls -la /var/www/
+    - mkdir -p /var/www/app
+    - rm -rf /var/www/app/*
+    - cp -r * /var/www/app/
 
 test_unit_job:
   before_script:
