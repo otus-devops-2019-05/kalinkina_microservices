@@ -12,12 +12,13 @@ before_script:
   - apk --update --no-cache add py-pip docker build-base python2-dev libffi-dev openssl-dev
   - pip install docker-compose
   - cd src
+  - export $(cat .env.example | xargs)
 
 build_job:
   stage: build
   script:
-    - docker-compose down --env_file=.env.example || true
-    - docker-compose build --env_file=.env.example
+    - docker-compose down || true
+    - docker-compose build 
 
 test_unit_job:
   before_script:
@@ -38,7 +39,7 @@ test_integration_job:
 deploy_dev_job:
   stage: review
   script:
-    - docker-compose up -d --env_file=.env.example
+    - docker-compose up -d
   environment:
     name: dev
     url: http://dev.example.com 
@@ -47,7 +48,7 @@ branch review:
   stage: review
   script: 
     - echo "Deploy to $CI_ENVIRONMENT_SLUG"
-    - docker-compose up -d --env_file=.env.example
+    - docker-compose up -d
   environment:
     name: branch/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.example.com
@@ -63,7 +64,7 @@ staging:
     - /^\d+\.\d+\.\d+/
   script:
     - echo 'Deploy'
-    - docker-compose up -d --env_file=.env.example
+    - docker-compose up -d
   environment:
     name: stage
     url: https://beta.example.com
@@ -75,7 +76,7 @@ production:
     - /^\d+\.\d+\.\d+/
   script:
     - echo 'Deploy'
-    - docker-compose up -d --env_file=.env.example
+    - docker-compose up -d
   environment:
     name: production
     url: https://example.com
