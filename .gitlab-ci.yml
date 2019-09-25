@@ -13,7 +13,9 @@ variables:
 before_script:
   - apk --update --no-cache add py-pip bash docker-compose
   - cd src
-  - echo $USER
+  - sudo groupadd docker
+  - sudo usermod -aG docker gitlab-runner
+  - newgrp docker || true
   - export $(cat .env.example | xargs)
 
 build_job:
