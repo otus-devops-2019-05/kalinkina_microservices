@@ -16,7 +16,7 @@ before_script:
 build_job:
   stage: build
   script:
-    - docker-compose down --env_file=.env.example
+    - docker-compose down --env_file=.env.example || true
     - docker-compose build
 
 test_unit_job:
