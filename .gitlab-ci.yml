@@ -13,7 +13,7 @@ variables:
 before_script:
   - apk --update --no-cache add py-pip bash docker-compose
   - cd src
-  - addgroup gitlab-runner docker
+  - docker info
   - export $(cat .env.example | xargs)
 
 build_job:
