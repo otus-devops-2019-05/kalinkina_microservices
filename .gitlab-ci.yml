@@ -16,7 +16,7 @@ before_script:
 build_job:
   stage: build
   script:
-    - docker-compose down
+    - docker-compose down --env_file=.env.example
     - docker-compose build
 
 test_unit_job:
@@ -38,7 +38,7 @@ test_integration_job:
 deploy_dev_job:
   stage: review
   script:
-    - docker-compose up -d
+    - docker-compose up -d --env_file=.env.example
   environment:
     name: dev
     url: http://dev.example.com 
@@ -47,7 +47,7 @@ branch review:
   stage: review
   script: 
     - echo "Deploy to $CI_ENVIRONMENT_SLUG"
-    - docker-compose up -d
+    - docker-compose up -d --env_file=.env.example
   environment:
     name: branch/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.example.com
@@ -63,7 +63,7 @@ staging:
     - /^\d+\.\d+\.\d+/
   script:
     - echo 'Deploy'
-    - docker-compose up -d
+    - docker-compose up -d --env_file=.env.example
   environment:
     name: stage
     url: https://beta.example.com
@@ -75,7 +75,7 @@ production:
     - /^\d+\.\d+\.\d+/
   script:
     - echo 'Deploy'
-    - docker-compose up -d
+    - docker-compose up -d --env_file=.env.example
   environment:
     name: production
     url: https://example.com
