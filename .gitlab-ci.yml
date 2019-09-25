@@ -11,7 +11,7 @@ variables:
   DATABASE_URL: 'mongodb://mongo/user_posts'
 
 before_script:
-  - apk --update --no-cache add py-pip 
+  - apk --update --no-cache add py-pip bash
   - cd src
   - export $(cat .env.example | xargs)
 
@@ -19,7 +19,7 @@ build_job:
   stage: build
   script:
     - docker-compose down || true
-    - docker-compose build 
+    - docker-compose build
 
 test_unit_job:
   before_script:
@@ -43,11 +43,11 @@ deploy_dev_job:
     - docker-compose up -d
   environment:
     name: dev
-    url: http://dev.example.com 
+    url: http://dev.example.com
 
 branch review:
   stage: review
-  script: 
+  script:
     - echo "Deploy to $CI_ENVIRONMENT_SLUG"
     - docker-compose up -d
   environment:
