@@ -11,7 +11,7 @@ variables:
   DATABASE_URL: 'mongodb://mongo/user_posts'
 
 before_script:
-  - apk --update --no-cache add py-pip bash
+  - apk --update --no-cache add py-pip bash docker-compose
   - cd src
   - export $(cat .env.example | xargs)
 
