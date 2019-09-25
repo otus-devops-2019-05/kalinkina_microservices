@@ -203,3 +203,36 @@ sudo ip netns
 Задать имя проекта можно с помощью переменной COMPOSE_PROJECT_NAME или указать имя во время поднятия композа `docker-compose -p my_project up -d`
 
 > By default, Compose reads two files, a docker-compose.yml and an optional docker-compose.override.yml file. By convention, the docker-compose.yml contains your base configuration. The override file, as its name implies, can contain configuration overrides for existing services or entirely new services.
+***
+
+## HW-15
+## Устройство Gitlab CI. Построение процесса непрерывной поставки
+
+> Для запуска Gitlab CI мы будем использовать omnibus-установку. Основной плюс - можно быстро запустить сервис. Минусом такого типа установки является то, что такую инсталляцию тяжелее эксплуатировать и дорабатывать.
+
+  - Ставим Docker `ansible -i inventory all -m ping`
+  ```
+mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs
+cd /srv/gitlab/
+touch docker-compose.yml
+```
+  - docker-compose.yml
+  ```
+  web:
+  image: 'gitlab/gitlab-ce:latest'
+  restart: always
+  hostname: 'gitlab.example.com'
+  environment:
+    GITLAB_OMNIBUS_CONFIG: |
+      external_url 'http://<YOUR-VM-IP>'
+  ports:
+    - '80:80'
+    - '443:443'
+    - '2222:22'
+  volumes:
+    - '/srv/gitlab/config:/etc/gitlab'
+    - '/srv/gitlab/logs:/var/log/gitlab'
+    - '/srv/gitlab/data:/var/opt/gitlab'
+    ```
+
+### Задание с *
