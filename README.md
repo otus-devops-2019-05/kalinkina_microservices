@@ -210,7 +210,7 @@ sudo ip netns
 
 > Для запуска Gitlab CI мы будем использовать omnibus-установку. Основной плюс - можно быстро запустить сервис. Минусом такого типа установки является то, что такую инсталляцию тяжелее эксплуатировать и дорабатывать.
 
-  - Ставим Docker `ansible -i inventory all -m ping`
+  - Ставим Docker `ansible-playbook -i inventory playbooks/packer_docker.yml`
   ```
 mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs
 cd /srv/gitlab/
