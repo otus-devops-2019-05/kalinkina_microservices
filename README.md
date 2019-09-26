@@ -241,3 +241,6 @@ touch docker-compose.yml
 privileged = true
 volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
 ```
+  - в гитлаб CI/CD -> Variables прописала значения для CI_REGISTRY_USER, CI_REGISTRY_PASSWORD
+
+  - интеграция сo Slack - devops-team-otus.slack.com канал #lada_kalinkina
