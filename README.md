@@ -43,7 +43,7 @@ Run 'docker system COMMAND --help' for more information on a command.
 
 
   - export GOOGLE_PROJECT=_ваш-проект_
-  - 
+  -
   ```
   docker-machine create --driver google \
   --google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
@@ -70,22 +70,22 @@ Run 'docker system COMMAND --help' for more information on a command.
 
 ## Немного теории
   - PID namespace - отделяет образ видимости процессов друг от друга
-  при запуске контейнера есть процесс, который создает первый процесс для дерева процессов внутри докера, от этого процесса с PID 1 создаются все дочерние процессы. Дочерние процессы ничего не знают о процессах, находящихся не в их дереве. 
+  при запуске контейнера есть процесс, который создает первый процесс для дерева процессов внутри докера, от этого процесса с PID 1 создаются все дочерние процессы. Дочерние процессы ничего не знают о процессах, находящихся не в их дереве.
   - net namespace - процессы в net namespace имеют собственные сетевые интерфейсы. Можно перемещать сетевые интерфейсы между нэймспэйсами. Сетевое пространство имен нельзя удалить при помощи системного вызова. Оно будет существовать пока его использует хотя бы один процесс. Мост docker0 обеспечивает общение всех контейнеров на хосте с ОС.
 ```
 brctl show docker0
 bridge name	bridge id		STP enabled	interfaces
 docker0		8000.02428a3cd879	no		vethda5ab45
 ```
-  - mnt namespace - создаем независимые файловые системы. Сначала дочерний процесс видит те же точки монтирования, что и родительский. Как только дочерний процесс перенес в отдельное пространство имен к нему можно примонтировать любую ФС. Точки монтирования могут быть приватными или доступными нескольким контейнерам. 
+  - mnt namespace - создаем независимые файловые системы. Сначала дочерний процесс видит те же точки монтирования, что и родительский. Как только дочерний процесс перенес в отдельное пространство имен к нему можно примонтировать любую ФС. Точки монтирования могут быть приватными или доступными нескольким контейнерам.
   - uts namespace - назначает хостнэйм и доменные имена. id контейнера - это хостнэйм.
   - IPC namespace - организует межпроцессорное взаимодействие, обеспечивают жоступ к shared memory
 
   `docker run --rm -ti tehbilly/htop` показывает процессы только внутри контейнера
   `docker run --rm --pid host -ti tehbilly/htop` показывает процессы хоста
-  
+
 ## Dockerfile
-  Сборка ui началась не с первого шага, потому что некоторые слои файловой системы уже были созданы в другом имидже и просто переиспользовались. 
+  Сборка ui началась не с первого шага, потому что некоторые слои файловой системы уже были созданы в другом имидже и просто переиспользовались.
 
 > Сетевые алиасы могут быть использованы для сетевых соединений, как доменные имена.
 
@@ -93,7 +93,7 @@ docker0		8000.02428a3cd879	no		vethda5ab45
 
 #### Задание с *
   - для перезаписи значения переменных можно запускать контейнеры таким образом
-  
+
 ```
 docker run -d --network=reddit --network-alias=post_db_1 --network-alias=comment_db_1 mongo:latest
 docker run -d --network=reddit --network-alias=post -e POST_DATABASE_HOST='post_db_1' <your-dockerhub-login>/post:1.0
@@ -101,7 +101,7 @@ docker run -d --network=reddit --network-alias=comment -e COMMENT_DATABASE_HOST=
 docker run -d --network=reddit -p 9292:9292 <your-dockerhub-login>/ui:1.0
 ```
 
-  - уменьшение образа 
+  - уменьшение образа
   2.0 - образ ubuntu
 ```
 REPOSITORY                 TAG                 IMAGE ID            CREATED             SIZE
@@ -129,7 +129,7 @@ XXXXXXXXXXXX/ui            3.0                 5b4a06f51525        51 seconds ag
           UP LOOPBACK RUNNING  MTU:65536  Metric:1
           RX packets:0 errors:0 dropped:0 overruns:0 frame:0
           TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000 
+          collisions:0 txqueuelen:1000
           RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
   ```
   - Сеть контейнера полностью изолирована
@@ -143,7 +143,7 @@ XXXXXXXXXXXX/ui            3.0                 5b4a06f51525        51 seconds ag
           UP BROADCAST MULTICAST  MTU:1500  Metric:1
           RX packets:30 errors:0 dropped:0 overruns:0 frame:0
           TX packets:47 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0 
+          collisions:0 txqueuelen:0
           RX bytes:11924 (11.6 KiB)  TX bytes:11432 (11.1 KiB)
 
 docker0   Link encap:Ethernet  HWaddr 02:42:FC:CC:74:9E  
@@ -152,7 +152,7 @@ docker0   Link encap:Ethernet  HWaddr 02:42:FC:CC:74:9E
           UP BROADCAST MULTICAST  MTU:1500  Metric:1
           RX packets:59711 errors:0 dropped:0 overruns:0 frame:0
           TX packets:73180 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:0 
+          collisions:0 txqueuelen:0
           RX bytes:4609042 (4.3 MiB)  TX bytes:1238059852 (1.1 GiB)
 
 ens4      Link encap:Ethernet  HWaddr 42:01:0A:84:00:03  
@@ -161,7 +161,7 @@ ens4      Link encap:Ethernet  HWaddr 42:01:0A:84:00:03
           UP BROADCAST RUNNING MULTICAST  MTU:1460  Metric:1
           RX packets:576306 errors:0 dropped:0 overruns:0 frame:599
           TX packets:521496 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000 
+          collisions:0 txqueuelen:1000
           RX bytes:2069009448 (1.9 GiB)  TX bytes:293093926 (279.5 MiB)
 
 lo        Link encap:Local Loopback  
@@ -170,7 +170,7 @@ lo        Link encap:Local Loopback
           UP LOOPBACK RUNNING  MTU:65536  Metric:1
           RX packets:932330 errors:0 dropped:0 overruns:0 frame:0
           TX packets:932330 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000 
+          collisions:0 txqueuelen:1000
           RX bytes:126447265 (120.5 MiB)  TX bytes:126447265 (120.5 MiB)
 ```
   - Сеть не управляется самим Docker
@@ -189,7 +189,7 @@ a5a8dc381043        nginx                      "nginx -g 'daemon of…"   28 sec
 ```
 sudo ln -s /var/run/docker/netns /var/run/netns
 sudo ip netns
-``` 
+```
 
 > ip netns exec <namespace> <command> - позволит выполнять команды в выбранном namespace
 
@@ -199,7 +199,48 @@ sudo ip netns
   - Нет Service Discovery
 
 ## Docker-compose
-Если базовое имя не задано, то используется название директории, в которой лежит файл docker-compose.yml. 
+Если базовое имя не задано, то используется название директории, в которой лежит файл docker-compose.yml.
 Задать имя проекта можно с помощью переменной COMPOSE_PROJECT_NAME или указать имя во время поднятия композа `docker-compose -p my_project up -d`
 
 > By default, Compose reads two files, a docker-compose.yml and an optional docker-compose.override.yml file. By convention, the docker-compose.yml contains your base configuration. The override file, as its name implies, can contain configuration overrides for existing services or entirely new services.
+***
+
+## HW-15
+## Устройство Gitlab CI. Построение процесса непрерывной поставки
+
+> Для запуска Gitlab CI мы будем использовать omnibus-установку. Основной плюс - можно быстро запустить сервис. Минусом такого типа установки является то, что такую инсталляцию тяжелее эксплуатировать и дорабатывать.
+
+  - Ставим Docker `ansible-playbook -i inventory playbooks/packer_docker.yml`
+  ```
+mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs
+cd /srv/gitlab/
+touch docker-compose.yml
+```
+  - docker-compose.yml
+  ```
+  web:
+  image: 'gitlab/gitlab-ce:latest'
+  restart: always
+  hostname: 'gitlab.example.com'
+  environment:
+    GITLAB_OMNIBUS_CONFIG: |
+      external_url 'http://<YOUR-VM-IP>'
+  ports:
+    - '80:80'
+    - '443:443'
+    - '2222:22'
+  volumes:
+    - '/srv/gitlab/config:/etc/gitlab'
+    - '/srv/gitlab/logs:/var/log/gitlab'
+    - '/srv/gitlab/data:/var/opt/gitlab'
+    ```
+
+### Задание с *
+  - build и deploy приложения для того чтобы .gitlab-ci.yml нормально отрабатывал пришлось изменить настройки внутри гитлаб-раннера в файле /etc/gitlab-runner/config.toml
+```
+privileged = true
+volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
+```
+  - в гитлаб CI/CD -> Variables прописала значения для CI_REGISTRY_USER, CI_REGISTRY_PASSWORD
+
+  - интеграция сo Slack - devops-team-otus.slack.com канал #lada_kalinkina
