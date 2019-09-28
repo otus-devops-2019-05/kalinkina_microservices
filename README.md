@@ -211,13 +211,14 @@ sudo ip netns
 > Для запуска Gitlab CI мы будем использовать omnibus-установку. Основной плюс - можно быстро запустить сервис. Минусом такого типа установки является то, что такую инсталляцию тяжелее эксплуатировать и дорабатывать.
 
   - Ставим Docker `ansible-playbook -i inventory playbooks/packer_docker.yml`
-  ```
+
+```
 mkdir -p /srv/gitlab/config /srv/gitlab/data /srv/gitlab/logs
 cd /srv/gitlab/
 touch docker-compose.yml
 ```
   - docker-compose.yml
-  ```
+```
   web:
   image: 'gitlab/gitlab-ce:latest'
   restart: always
@@ -233,7 +234,7 @@ touch docker-compose.yml
     - '/srv/gitlab/config:/etc/gitlab'
     - '/srv/gitlab/logs:/var/log/gitlab'
     - '/srv/gitlab/data:/var/opt/gitlab'
-    ```
+```
 
 ### Задание с *
   - build и deploy приложения для того чтобы .gitlab-ci.yml нормально отрабатывал пришлось изменить настройки внутри гитлаб-раннера в файле /etc/gitlab-runner/config.toml
@@ -244,3 +245,90 @@ volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
   - в гитлаб CI/CD -> Variables прописала значения для CI_REGISTRY_USER, CI_REGISTRY_PASSWORD
 
   - интеграция сo Slack - devops-team-otus.slack.com канал #lada_kalinkina
+***
+
+## HW-16
+## Введение в мониторинг. Системы мониторинга.
+
+### Подготовка окружения
+  - правила фаервола для Prometheus и Puma:
+  ```
+  gcloud compute firewall-rules create prometheus-default --allow tcp:9090
+  gcloud compute firewall-rules create puma-default --allow tcp:9292
+  ```
+  - cоздание и настройка Docker хоста
+  ```
+  export GOOGLE_PROJECT=_ваш-проект_
+  docker-machine create --driver google \
+    --google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+    --google-machine-type n1-standard-1 \
+    --google-zone europe-west1-b \
+    docker-host
+  eval $(docker-machine env docker-host)
+  docker run --rm -p 9090:9090 -d --name prometheus  prom/prometheus
+  ```
+  `docker-machine ip docker-host` - узнать ip адрес
+
+> Targets (цели) - представляют собой системы или процессы, за которыми следит Prometheus. Prometheus является pull системой, поэтому он постоянно делает HTTP запросы на имеющиеся у него адреса (endpoints).
+
+> Вся конфигурация Prometheus, в отличие от многих других систем мониторинга, происходит через файлы конфигурации (prometheus.yml) и опции командной строки.
+
+### Мониторинг состояния микросервисов
+
+> Healthcheck-и представляют собой проверки того, что наш сервис здоров и работает в ожидаемом режиме. В нашем случае healthcheck выполняется внутри кода микросервиса и выполняет проверку того, что все сервисы, от которых зависит его работа, ему доступны.
+Если требуемые для его работы сервисы здоровы, то healthcheck проверка возвращает status = 1, что соответсвует тому, что сам сервис здоров.
+Если один из нужных ему сервисов нездоров или недоступен, то проверка вернет status = 0.
+
+#### Exporters
+  -  Программа, которая делает метрики доступными для сбора Prometheus
+  -  Дает возможность конвертировать метрики в нужный для Prometheus формат
+  -  Используется когда нельзя поменять код приложения
+  -  Примеры: PostgreSQL, RabbitMQ, Nginx, Node exporter, cAdvisor
+
+Ссылка на DockerHub репозиторий - docker.io/e485b48b03c0
+
+## Задание со *
+
+1) мониторинг MongoDB
+  - использовался репозиторий https://github.com/percona/mongodb_exporter
+  - на его основе собрала имидж
+```
+git clone git@github.com:percona/mongodb_exporter.git
+cd mongodb_exporter
+docker build -t $USER_NAME/mongodb_exporter .
+```
+  - добавила в prometheus.yml
+```
+- job_name: 'mongodb'
+  static_configs:
+    - targets:
+      - 'mongodb-exporter:9216'
+```
+  - пересобрала образ прометеуса
+  - добавила новый контейнер с экспортером
+```
+mongodb-exporter:
+  image: ${USERNAME}/mongodb_exporter:latest
+  environment:
+    - MONGODB_URI='mongodb://mongo_db:27017'
+  depends_on:
+    - mongo_db
+  networks:
+    - back-net
+    - front-net
+```
+
+2) Добавить мониторинг сервисов comment, post, ui с помощью blackbox экспортера.
+
+#### Blackbox мониторинг
+  - Мониторинг извне с точки зрения пользователя
+  - Не видим, как работает система внутри
+  - Примеры: проверка открытых портов, подсчет коннектов, наличие процесса
+
+#### Whitebox мониторинг
+  - Мониторинг на основе информации о внутренней работе системы
+  - Примеры: метрики приложений (время запроса к БД, количество пользователей и т.д.)
+
+ Реализация такая же как в предыдущем задании только вместо локльного билда имиджа скачиваем его с DockerHub.
+
+ 3) Makefile для автоматизации сборки и отправки имиджей в DockerHub
