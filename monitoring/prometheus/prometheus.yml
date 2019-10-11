@@ -58,7 +58,7 @@ scrape_configs:
         - 'post:5000'
 
 rule_files:
-  - "alert.yml"
+  - "alerts.yml"
 
 alerting:
   alertmanagers:
