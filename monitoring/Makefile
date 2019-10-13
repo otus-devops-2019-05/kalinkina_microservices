@@ -1,41 +1,46 @@
 default: build_all push_all
 
-export = export USER_NAME=e485b48b03c0
+USERNAME = e485b48b03c0
 
-login = $(export); docker login
+export = export "USER_NAME=e485b48b03c0"
 
-build_all: build_ui build_post build_comment build_prometheus
+login = docker login
+
+build_all: build_ui build_post build_comment build_prometheus build_alert
 
 build_ui:
-		$(export)
-		docker build -t $(USER_NAME)/ui -f ../src/ui/Dockerfile ../src/ui/
+		$(export) && cd ../src/ui/ && bash docker_build.sh && cd -
 
 build_post:
-		$(export)
-		docker build -t $(USER_NAME)/post -f ../src/post-py/Dockerfile ../src/post-py/
+		$(export) && cd ../src/post-py/ && bash docker_build.sh && cd -
 
 build_comment:
-		$(export)
-		docker build -t $(USER_NAME)/comment -f ../src/comment/Dockerfile ../src/comment/
+		$(export) && cd ../src/comment/ && bash docker_build.sh && cd -
 
 build_prometheus:
-		$(export)
-		docker build -t $(USER_NAME)/prometheus -f ./prometheus/Dockerfile ./prometheus/
+		docker build -t $(USERNAME)/prometheus -f ./prometheus/Dockerfile ./prometheus/
 
-push_all: push_ui push_post push_comment push_prometheus
+build_alert:
+		docker build -t $(USERNAME)/alertmanager -f ./alertmanager/Dockerfile ./alertmanager/
+
+push_all: push_ui push_post push_comment push_prometheus push_alert
 
 push_ui:
 		$(login)
-		docker push $(USER_NAME)/ui:latest
+		docker push $(USERNAME)/ui:logging
 
 push_post:
 		$(login)
-		docker push $(USER_NAME)/post:latest
+		docker push $(USERNAME)/post:logging
 
 push_comment:
 		$(login)
-		docker push $(USER_NAME)/comment:latest
+		docker push $(USERNAME)/comment:logging
 
 push_prometheus:
 		$(login)
-		docker push $(USER_NAME)/prometheus:latest
+		docker push $(USERNAME)/prometheus:latest
+
+push_alert:
+		$(login)
+		docker push $(USERNAME)/alertmanager:latest

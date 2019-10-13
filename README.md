@@ -247,8 +247,7 @@ volumes = ["/cache", "/var/run/docker.sock:/var/run/docker.sock"]
   - интеграция сo Slack - devops-team-otus.slack.com канал #lada_kalinkina
 ***
 
-## HW-16
-## Введение в мониторинг. Системы мониторинга.
+# HW-16. Введение в мониторинг. Системы мониторинга.
 
 ### Подготовка окружения
   - правила фаервола для Prometheus и Puma:
@@ -332,3 +331,85 @@ mongodb-exporter:
  Реализация такая же как в предыдущем задании только вместо локльного билда имиджа скачиваем его с DockerHub.
 
  3) Makefile для автоматизации сборки и отправки имиджей в DockerHub
+***
+
+# HW-17. Мониторинг приложения и инфраструктуры.
+
+### Подготовка окружения
+
+```
+$ export GOOGLE_PROJECT=_ваш-проект_
+# Создать докер хост
+docker-machine create --driver google \
+    --google-machine-image https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts \
+    --google-machine-type n1-standard-1 \
+    --google-zone europe-west1-b \
+    docker-host
+# Настроить докер клиент на удаленный докер демон
+eval $(docker-machine env docker-host)
+# Переключение на локальный докер
+eval $(docker-machine env --unset)
+$ docker-machine ip docker-host
+```
+### cAdvisor
+
+> cAdvisor собирает информацию о ресурсах потребляемых контейнерами и характеристиках их работы.
+```
+cadvisor:
+  image: google/cadvisor:v0.29.0
+  volumes:
+    - '/:/rootfs:ro'
+    - '/var/run:/var/run:rw'
+    - '/sys:/sys:ro'
+    - '/var/lib/docker/:/var/lib/docker:ro'
+  ports:
+    - '8080:8080'
+```
+
+### Grafana
+
+  - поддерживает версионирование дашбордов
+
+### Мониторинг работы приложения
+1) счетчик ui_request_count, который считает каждый приходящий HTTP-запрос 
+
+### Alertmanager
+
+> Alertmanager - дополнительный компонент для системы мониторинга Prometheus, который отвечает за первичную обработку алертов и дальнейшую отправку оповещений по заданному назначению.
+
+  - Dockerfile
+```
+FROM prom/alertmanager:v0.14.0
+ADD config.yml /etc/alertmanager/
+```
+  - config.yml
+```
+global:
+  slack_api_url: 'https://hooks.slack.com/services/XXXXXXXXXXXXXXXXXXXXX'
+
+route:
+  receiver: 'slack-notifications'
+
+receivers:
+- name: 'slack-notifications'
+  slack_configs:
+  - channel: '#lada_kalinkina'
+```
+   - собираем образ `monitoring/alertmanager $ docker build -t $USER_NAME/alertmanager .`
+   - добавим в докер-композ
+```
+  alertmanager:
+    image: ${USERNAME}/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+    ports:
+      - 9093:9093
+```
+   - alerts.yml определяет условия при которых должен срабатывать алерт и посылаться Alertmanager-у
+   
+### Task with *
+1) билд alertmanager добавлен
+2) Добавить сбор docker метрик в Prometheus 
+Инструкция в [документации](https://docs.docker.com/config/thirdparty/prometheus/) 
+в случае с docker-machine локалхост не работает - `Get http://localhost:9323/metrics: dial tcp 127.0.0.1:9323: getsockopt: connection refused`
+нужно прописывать другой адрес и открывать данные докера в 0.0.0.0 что небезопасно
